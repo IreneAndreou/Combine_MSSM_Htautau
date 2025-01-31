@@ -7,7 +7,6 @@ from argparse import ArgumentParser
 from CombineHarvester.TauSF.fit_tools import DecomposeUncerts, FitSF, PlotSF
 ROOT.gROOT.SetBatch(1)
 
-# HI
 description = '''This script makes TGraphAsymmErrors objects from tau ID SF measurments.'''
 parser = ArgumentParser(prog="makeSFGraphs",description=description,epilog="Success!")
 parser.add_argument('--dm-bins', dest='dm_bins', default=False, action='store_true', help="if specified then the mu+tauh channel fits are also split by tau decay-mode")
@@ -21,7 +20,9 @@ if args.eras == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
 elif args.eras == '2022':
   eras = ['2022_preEE', '2022_postEE']
-else: 
+elif args.eras == 'Run3_2022':
+  eras = ['Run3_2022']
+else:
   eras = args.eras.split(',')
 
 dm_bins=args.dm_bins
@@ -41,6 +42,25 @@ if dm_bins:
   'rate_tauSF_DM0_pT50to60_2017','rate_tauSF_DM0_pT60to80_2017','rate_tauSF_DM0_pT80to100_2017','rate_tauSF_DM0_pT100to200_2017','rate_tauSF_DM1_pT20to25_2017','rate_tauSF_DM1_pT25to30_2017','rate_tauSF_DM1_pT30to35_2017','rate_tauSF_DM1_pT35to40_2017','rate_tauSF_DM1_pT40to50_2017','rate_tauSF_DM1_pT50to60_2017','rate_tauSF_DM1_pT60to80_2017','rate_tauSF_DM1_pT80to100_2017','rate_tauSF_DM1_pT100to200_2017','rate_tauSF_DM10_pT20to25_2017','rate_tauSF_DM10_pT25to30_2017','rate_tauSF_DM10_pT30to35_2017','rate_tauSF_DM10_pT35to40_2017','rate_tauSF_DM10_pT40to50_2017','rate_tauSF_DM10_pT50to60_2017','rate_tauSF_DM10_pT60to80_2017','rate_tauSF_DM10_pT80to100_2017','rate_tauSF_DM10_pT100to200_2017','rate_tauSF_DM11_pT20to25_2017','rate_tauSF_DM11_pT25to30_2017','rate_tauSF_DM11_pT30to35_2017','rate_tauSF_DM11_pT35to40_2017','rate_tauSF_DM11_pT40to50_2017','rate_tauSF_DM11_pT50to60_2017','rate_tauSF_DM11_pT60to80_2017','rate_tauSF_DM11_pT80to100_2017','rate_tauSF_DM11_pT100to200_2017','rate_tauSF_DM0_pT20to25_2018','rate_tauSF_DM0_pT25to30_2018','rate_tauSF_DM0_pT30to35_2018','rate_tauSF_DM0_pT35to40_2018','rate_tauSF_DM0_pT40to50_2018','rate_tauSF_DM0_pT50to60_2018','rate_tauSF_DM0_pT60to80_2018','rate_tauSF_DM0_pT80to100_2018','rate_tauSF_DM0_pT100to200_2018','rate_tauSF_DM1_pT20to25_2018','rate_tauSF_DM1_pT25to30_2018','rate_tauSF_DM1_pT30to35_2018','rate_tauSF_DM1_pT35to40_2018','rate_tauSF_DM1_pT40to50_2018','rate_tauSF_DM1_pT50to60_2018','rate_tauSF_DM1_pT60to80_2018','rate_tauSF_DM1_pT80to100_2018','rate_tauSF_DM1_pT100to200_2018','rate_tauSF_DM10_pT20to25_2018','rate_tauSF_DM10_pT25to30_2018','rate_tauSF_DM10_pT30to35_2018','rate_tauSF_DM10_pT35to40_2018','rate_tauSF_DM10_pT40to50_2018','rate_tauSF_DM10_pT50to60_2018','rate_tauSF_DM10_pT60to80_2018','rate_tauSF_DM10_pT80to100_2018','rate_tauSF_DM10_pT100to200_2018','rate_tauSF_DM11_pT20to25_2018','rate_tauSF_DM11_pT25to30_2018','rate_tauSF_DM11_pT30to35_2018','rate_tauSF_DM11_pT35to40_2018','rate_tauSF_DM11_pT40to50_2018','rate_tauSF_DM11_pT50to60_2018','rate_tauSF_DM11_pT60to80_2018','rate_tauSF_DM11_pT80to100_2018','rate_tauSF_DM11_pT100to200_2018']
   if any(era in eras for era in ['2022_preEE', '2022_postEE']):
     pois = ['rate_tauSF_DM0_pT20to25_2022_preEE','rate_tauSF_DM0_pT25to30_2022_preEE','rate_tauSF_DM0_pT30to35_2022_preEE','rate_tauSF_DM0_pT35to40_2022_preEE','rate_tauSF_DM0_pT40to50_2022_preEE','rate_tauSF_DM0_pT50to60_2022_preEE','rate_tauSF_DM0_pT60to80_2022_preEE','rate_tauSF_DM0_pT80to100_2022_preEE','rate_tauSF_DM0_pT100to200_2022_preEE','rate_tauSF_DM1_pT20to25_2022_preEE','rate_tauSF_DM1_pT25to30_2022_preEE','rate_tauSF_DM1_pT30to35_2022_preEE','rate_tauSF_DM1_pT35to40_2022_preEE','rate_tauSF_DM1_pT40to50_2022_preEE','rate_tauSF_DM1_pT50to60_2022_preEE','rate_tauSF_DM1_pT60to80_2022_preEE','rate_tauSF_DM1_pT80to100_2022_preEE','rate_tauSF_DM1_pT100to200_2022_preEE','rate_tauSF_DM10_pT20to25_2022_preEE','rate_tauSF_DM10_pT25to30_2022_preEE','rate_tauSF_DM10_pT30to35_2022_preEE','rate_tauSF_DM10_pT35to40_2022_preEE','rate_tauSF_DM10_pT40to50_2022_preEE','rate_tauSF_DM10_pT50to60_2022_preEE','rate_tauSF_DM10_pT60to80_2022_preEE','rate_tauSF_DM10_pT80to100_2022_preEE','rate_tauSF_DM10_pT100to200_2022_preEE','rate_tauSF_DM11_pT20to25_2022_preEE','rate_tauSF_DM11_pT25to30_2022_preEE','rate_tauSF_DM11_pT30to35_2022_preEE','rate_tauSF_DM11_pT35to40_2022_preEE','rate_tauSF_DM11_pT40to50_2022_preEE','rate_tauSF_DM11_pT50to60_2022_preEE','rate_tauSF_DM11_pT60to80_2022_preEE','rate_tauSF_DM11_pT80to100_2022_preEE','rate_tauSF_DM11_pT100to200_2022_preEE','rate_tauSF_DM0_pT20to25_2022_postEE','rate_tauSF_DM0_pT25to30_2022_postEE','rate_tauSF_DM0_pT30to35_2022_postEE','rate_tauSF_DM0_pT35to40_2022_postEE','rate_tauSF_DM0_pT40to50_2022_postEE','rate_tauSF_DM0_pT50to60_2022_postEE','rate_tauSF_DM0_pT60to80_2022_postEE','rate_tauSF_DM0_pT80to100_2022_postEE','rate_tauSF_DM0_pT100to200_2022_postEE','rate_tauSF_DM1_pT20to25_2022_postEE','rate_tauSF_DM1_pT25to30_2022_postEE','rate_tauSF_DM1_pT30to35_2022_postEE','rate_tauSF_DM1_pT35to40_2022_postEE','rate_tauSF_DM1_pT40to50_2022_postEE','rate_tauSF_DM1_pT50to60_2022_postEE','rate_tauSF_DM1_pT60to80_2022_postEE','rate_tauSF_DM1_pT80to100_2022_postEE','rate_tauSF_DM1_pT100to200_2022_postEE','rate_tauSF_DM10_pT20to25_2022_postEE','rate_tauSF_DM10_pT25to30_2022_postEE','rate_tauSF_DM10_pT30to35_2022_postEE','rate_tauSF_DM10_pT35to40_2022_postEE','rate_tauSF_DM10_pT40to50_2022_postEE','rate_tauSF_DM10_pT50to60_2022_postEE','rate_tauSF_DM10_pT60to80_2022_postEE','rate_tauSF_DM10_pT80to100_2022_postEE','rate_tauSF_DM10_pT100to200_2022_postEE','rate_tauSF_DM11_pT20to25_2022_postEE','rate_tauSF_DM11_pT25to30_2022_postEE','rate_tauSF_DM11_pT30to35_2022_postEE','rate_tauSF_DM11_pT35to40_2022_postEE','rate_tauSF_DM11_pT40to50_2022_postEE','rate_tauSF_DM11_pT50to60_2022_postEE','rate_tauSF_DM11_pT60to80_2022_postEE','rate_tauSF_DM11_pT80to100_2022_postEE','rate_tauSF_DM11_pT100to200_2022_postEE']
+  if any(era in eras for era in ['Run3_2022']):
+
+    pois = []
+
+    for era in eras:
+      temp_pois=[
+        "rate_tauSF_DM$DM_pT20to25_$YEAR",
+        "rate_tauSF_DM$DM_pT25to30_$YEAR",
+        "rate_tauSF_DM$DM_pT30to35_$YEAR",
+        "rate_tauSF_DM$DM_pT35to40_$YEAR",
+        "rate_tauSF_DM$DM_pT40to50_$YEAR",
+        "rate_tauSF_DM$DM_pT50to60_$YEAR",
+        "rate_tauSF_DM$DM_pT60to80_$YEAR",
+        "rate_tauSF_DM$DM_pT80to100_$YEAR",
+        "rate_tauSF_DM$DM_pT100to200_$YEAR",
+      ]
+
+      pois += [x.replace('$DM', y).replace('$YEAR', era) for y in ['0','1','2','10','11'] for x in temp_pois]
+
   #if args.pt_bins == 1:
   #   pois = ['rate_tauSF_DM0_pT20to25_2017','rate_tauSF_DM1_pT20to25_2017','rate_tauSF_DM10_pT20to25_2017','rate_tauSF_DM11_pT20to25_2017']
   #if args.pt_bins == 2:
@@ -87,7 +107,7 @@ for e in eras:
 
 
   if dm_bins:
-    for dm in [0,1,10,11]: graph_values['%i_%s' % (dm,e)] = []
+    for dm in [0,1,2,10,11]: graph_values['%i_%s' % (dm,e)] = []
   else: 
     graph_values['inclusive_%s' % e] = []  
 
@@ -132,7 +152,7 @@ sf_map[wp] = {}
 if not dm_bins:
 
   for era in eras:
-    print 'pT-binned SFs for era %s:' %era
+    print(f'pT-binned SFs for era {era}:')
     out='((gen_match_2!=5) + (gen_match_2==5)*('
     for i, b in enumerate(bin_boundaries[:-1]):
       x=list(vals['rate_tauSF_DMinclusive_pT%ito%i_%s' % (int(b), int(bin_boundaries[i+1]), era)])
@@ -142,7 +162,7 @@ if not dm_bins:
       else: out+='(pt_2>=%i&&pt_2<%i)*(%.3f)+' %(b, bin_boundaries[i+1], val) 
     out+='))'
     sf_map[wp][era] = out
-    print out
+    print(out)
 
 print ('Writing to file: %s' % fout_name)
 fout = ROOT.TFile(fout_name,'RECREATE')
@@ -189,14 +209,14 @@ for g_val in graph_values:
 
 if dm_bins:
   for era in eras:
-    print 'DM-binned SFs for era %s:' %era
+    print(f'DM-binned SFs for era {era}:')
     out='((gen_match_2!=5) + (gen_match_2==5)*('
     for dm in [0,1,10,11]:
       out+='(tau_decay_mode_2==%i)*(%s)+' % (dm, dm_binned_strings['DM%i_%s' % (dm,era)])
     out=out[:-1]
     out+='))'
     sf_map[wp][era] = out
-    print out
+    print(out)
 
 if args.saveJson:
   if dm_bins: json_out_name = 'tau_SF_strings_dm_binned_%(wp)s.json' % vars()
