@@ -4,6 +4,7 @@ from array import array
 from argparse import ArgumentParser
 import json
 from CombineHarvester.TauSF.fit_tools import DecomposeUncerts, FitSF, PlotSF
+import ctypes
 ROOT.gROOT.SetBatch(1)
 
 # HI
@@ -28,7 +29,9 @@ if args.eras == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
 elif args.eras == '2022':
   eras = ['2022_preEE', '2022_postEE']
-else: 
+elif args.eras == 'Run3_2022':
+  eras = ['Run3_2022']
+else:
   eras = args.eras.split(',')
 
 output_folder=args.output_folder
@@ -36,7 +39,7 @@ output_folder=args.output_folder
 
 def GraphDivideErrors(num, den):
     res = num.Clone()
-    for i in xrange(num.GetN()):
+    for i in range(num.GetN()):
         if type(res) is ROOT.TGraphAsymmErrors:
           if den.Eval(res.GetX()[i]) == 0:
               res.GetEYhigh()[i] = 0
@@ -120,8 +123,8 @@ def SplitUncerts(g1,g2,g3,era,dm=None,g4=None):
     gout3.SetPointEYlow(i,down_ptbins)   
 
     #for uncertainty variations we just store the errors and set the nominal values to 0 
-    x=ROOT.Double()
-    y=ROOT.Double()
+    x=ctypes.c_double(0.0)
+    y=ctypes.c_double(0.0)
 
     g1.GetPoint(i,x,y)
  
@@ -168,7 +171,7 @@ fout = ROOT.TFile(output_folder+'/'+out_file,'RECREATE')
 for era in eras:
   dms = ['inclusive']
   if args.dm_bins: 
-    dms = [0,1,10,11]
+    dms = [0,1,2,10,11]
 
   for dm in dms:
  
@@ -212,11 +215,11 @@ for era in eras:
 
 def MakeUpAndDownVariations(g,guncert):
 
-  x = ROOT.Double()
-  y = ROOT.Double()
+  x = ctypes.c_double(0.0)
+  y = ctypes.c_double(0.0)
 
-  x_uncert = ROOT.Double()
-  y_uncert = ROOT.Double()
+  x_uncert = ctypes.c_double(0.0)
+  y_uncert = ctypes.c_double(0.0)
 
   gout_up = g.Clone()
   gout_down = g.Clone()
@@ -224,13 +227,13 @@ def MakeUpAndDownVariations(g,guncert):
   for i in range(0,g.GetN()):
     g.GetPoint(i,x,y) 
     guncert.GetPoint(i,x_uncert,y_uncert)
-  
-    if x_uncert != x: 
-      print 'ERRRO: x bins values don\'t match!'
+
+    if x_uncert.value != x.value:
+      print('ERRROR: x bins values don\'t match!')
       exit() 
 
-    up=y+guncert.GetErrorYhigh(i)
-    down=y-guncert.GetErrorYlow(i)
+    up=y.value+guncert.GetErrorYhigh(i)
+    down=y.value-guncert.GetErrorYlow(i)
    
     gout_up.SetPoint(i,x,up) 
     gout_down.SetPoint(i,x,down) 
@@ -259,8 +262,8 @@ def PlotpTBinned(nom, systs,output_name):
     syst.SetLineColor(colors[i]) 
     leg.AddEntry(syst,'_'.join(str(syst.GetName()).split('_')[2:]),'e')
     for j in range(0,nom.GetN()):
-      x=ROOT.Double()
-      y=ROOT.Double()
+      x=ctypes.c_double(0.0)
+      y=ctypes.c_double(0.0)
       nom.GetPoint(j,x,y)
       syst.SetPoint(j,x,y)
     syst.Draw('pep') 
@@ -314,16 +317,16 @@ dm_binned_strings={}
 tot_chi2=0.
 tot_ndf=0.
 
+print("-"*50)
 if args.dm_bins:
-
-
   for era in eras:
-    for dm in [0,1,10,11]:
+    for dm in [0,1,2,10,11]:
 
-      if args.split_fit: fit_func='pol1_split'
+      if args.split_fit:
+        fit_func='pol1_split'
       elif args.split_fit_join: fit_func='pol1_split_constrained'
       else: fit_func='pol_order-2'
-     
+
 #      if dm==1 and era != '2016_preVFP': fit_func='erf'
       graph_name = 'DM%(dm)s_%(era)s' % vars()
 
@@ -356,7 +359,7 @@ if args.dm_bins:
       print('finished fitting nominal\n')
 
       extra_name=''
-      if args.split_fit: extra_name='_split_fit' 
+      if args.split_fit: extra_name='_split_fit'
       elif args.split_fit_join: extra_name='_split_fit_join'
 
       if sepTES:
@@ -396,7 +399,7 @@ if args.dm_bins:
           fit_rel_down.Write()
           fit_up = ROOT.TF1(graph_name+'_TESUp_fit',func_rel_up+'*'+func_nom,20,200)       
           fit_down = ROOT.TF1(graph_name+'_TESDown_fit',func_rel_down+'*'+func_nom,20,200)       
- 
+
         fit_up.Write()
         fit_down.Write()
         systs_to_plot.append((fit_up.Clone(), fit_down.Clone()))
@@ -408,12 +411,28 @@ if args.dm_bins:
       # we also fit the nominal SFs with a pol0 function for pT>40 to match the old prescription
       g_pol0 = g.Clone()
       g_pol0.SetName(g.GetName()+'_pol0_gt40')
-      fit_pol0, h_uncert_pol0, h_pol0, uncerts_pol0 = FitSF(g_pol0,func='pol0_gt40')
+      # g_pol0
+      # loop over bins and print bin contents and errors
+      n_points = g_pol0.GetN()  # Number of points in the graph
+
+      for i in range(n_points):
+          x = ctypes.c_double(0.0)
+          y = ctypes.c_double(0.0)
+          g_pol0.GetPoint(i, x, y)
+          err_x_low = g_pol0.GetErrorXlow(i)
+          err_x_high = g_pol0.GetErrorXhigh(i)
+          err_y_low = g_pol0.GetErrorYlow(i)
+          err_y_high = g_pol0.GetErrorYhigh(i)
+
+          print(f"Point {i}: X = {x.value:.4f} (+{err_x_high:.4f}, -{err_x_low:.4f}), "
+                f"Y = {y.value:.4f} (+{err_y_high:.4f}, -{err_y_low:.4f})")
+      # TODO: DANNY WHY? :(
+      fit_pol0, h_uncert_pol0, h_pol0, uncerts_pol0 = FitSF(g_pol0,func='pol1_gt40')
+
       fit_pol0.Write()
       h_uncert_pol0.Write()
 
       name = fit_nom.GetName()
- 
 
       stats_to_plot = []
       for x in uncerts_nom:
@@ -435,6 +454,11 @@ if args.dm_bins:
         dm_binned_strings[g.GetName()] = str(fit_nom.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
       if dm==1:
         PlotSF(g, h_uncert_nom, 'tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name, title='#tau^{ #pm} #rightarrow #pi^{ #pm} #pi^{ 0} #nu_{#tau}, %(era)s' % vars(), output_folder=output_folder)
+        CompareSystsPlot(fit_nom,systs_to_plot,output_folder+'/'+'uncerts_systs_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
+        CompareSystsPlot(fit_nom,stats_to_plot,output_folder+'/'+'uncerts_stats_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
+        dm_binned_strings[g.GetName()] = str(fit_nom.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
+      if dm==2:
+        PlotSF(g, h_uncert_nom, 'tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name, title='#tau^{ #pm} #rightarrow #pi^{ #pm} #pi^{ #pm} #pi^{ 0} #nu_{#tau}, %(era)s' % vars(), output_folder=output_folder)
         CompareSystsPlot(fit_nom,systs_to_plot,output_folder+'/'+'uncerts_systs_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
         CompareSystsPlot(fit_nom,stats_to_plot,output_folder+'/'+'uncerts_stats_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
         dm_binned_strings[g.GetName()] = str(fit_nom.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
@@ -460,29 +484,28 @@ if args.dm_bins and args.saveJson:
   sf_map = {}
   sf_map[wp] = {}
   for era in eras:
-    print 'DM-binned SFs for era %s:' %era
+    print(f'DM-binned SFs for era {era}:')
     out='((gen_match_2!=5) + (gen_match_2==5)*('
-    for dm in [0,1,10,11]:
+    for dm in [0,1,2,10,11]:
       out+='(tau_decay_mode_2==%i)*(%s)+' % (dm, dm_binned_strings['DM%i_%s' % (dm,era)])
     out=out[:-1]
     out+='))'
     sf_map[wp][era] = out
-    print out
+    print(out)
 
   json_out_name = output_folder+'tau_SF_strings_dm_binned_%(wp)s' % vars() + extra_name+'.json'
   with open(json_out_name, 'w') as fp:
     json.dump(sf_map, fp, sort_keys=True, indent=4)
 
 
-
 def compute_p_value(chi2, ndf):
     p_value = ROOT.TMath.Prob(chi2, int(ndf))
-    
+
     return p_value
 
 p_value = ROOT.TMath.Prob(tot_chi2, int(tot_ndf))
 file_name = "chi_2_values_polynomials.txt"
-print '\nTotal chi2/NDF, p-value = %.2f/%.0f, %.6f ' % (tot_chi2, tot_ndf, p_value)
+print(f'\nTotal chi2/NDF, p-value = {tot_chi2}.2f/{tot_ndf}.0f, {p_value}.6f ')
 with open(file_name, 'a') as file:
     # Write the formatted string to the file
     if args.split_fit:
