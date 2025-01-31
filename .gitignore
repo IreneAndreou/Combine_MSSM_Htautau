@@ -34,3 +34,7 @@ jobs/
 # jobs files
 *.sh.o*
 *.sh.e*
+
+raw_histograms/
+outputs/
+shapes/

@@ -129,6 +129,8 @@ def FitSF(h,func='erf'):
     f2.SetParameter(4,par[4]) #[4]
   elif func == 'pol0_gt40':
     f2 = ROOT.TF1("f2",'pol0',40.,200.)
+  elif func == 'pol1_gt40':
+    f2 = ROOT.TF1("f2",'pol1',40.,200.)
   elif func=='pol1_split':
     f2 = ROOT.TF1("f2",'(x<50)*([0]+[1]*x)+(x>=50)*([2]+[3]*x)',20.,200.)
   elif func=='pol1_split_constrained':
@@ -162,7 +164,7 @@ def FitSF(h,func='erf'):
     count+=1
   fit.SetName(h.GetName()+'_fit')
 
-  print 'Chi2/NDF = %.2f/%.0f, p-value = %.2f' % (f2.GetChisquare(), f2.GetNDF(), f2.GetProb())
+  print(f'Chi2/NDF = {f2.GetChisquare()}.2f/{f2.GetNDF()}.0f, p-value = {f2.GetProb()}.2f')
   return fit, h_uncert, h, uncerts
 
 def PlotSF(f, h, name, title='', output_folder='./'):
