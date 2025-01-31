@@ -112,14 +112,14 @@ if args.freeze:
     if len(parts) == 1:
       par = cmb.GetParameter(parts[0])
       if par: par.set_frozen(True)
-      else: print "Requested variable to freeze, %s, does not exist in workspace" % parts[0]
+      else: print(f"Requested variable to freeze, {parts[0]}, does not exist in workspace")
     else: 
       if len(parts) == 2: 
         par = cmb.GetParameter(parts[0])
         if par:
           par.set_val(float(parts[1]))
           par.set_frozen(True)
-        else: print "Requested variable to freeze, %s, does not exist in workspace" % parts[0] 
+        else: print(f"Requested variable to freeze, {parts[0]}, does not exist in workspace")
 
 
 for bin in bins_grouped:
@@ -138,7 +138,7 @@ for bin in bins_grouped:
   if dirname[-1] == "_": dirname=dirname[:-1]
   if '__' in dirname and 'mt' in args.channels: dirname=dirname.replace('__','_lt_')
   fout.mkdir(dirname)
-  print 'directory name = ', dirname
+  print('directory name = ', dirname)
 
   cmb_bin = cmb.cp().bin(bin)
 
@@ -165,7 +165,7 @@ for bin in bins_grouped:
   common_bins.sort()
   common_bins = array.array('d',common_bins)
   common_bins = np.array(common_bins)
-  print 'common binning  = ', common_bins
+  print('common binning  = ', common_bins)
 
   # rebin data to common bins:
   shapes_data = [s.Rebin(len(common_bins)-1, '', common_bins) for s in shapes_data]
@@ -190,12 +190,12 @@ for bin in bins_grouped:
          shape = cmb_bin.cp().bin([b]).process([p]).GetShapeWithUncertainty()
          rate = cmb_bin.cp().process([p]).backgrounds().GetRate() 
          err = cmb_bin.cp().bin(bins).backgrounds().GetUncertainty()
-         print 'QCD Bkg = %.1f +/- %.1f (%.3f)' % (rate, err, err/rate)
+         print(f'QCD Bkg = {rate}.1f +/- {err}.1f ({err/rate}.3f)')
       if p == "W": 
          shape = cmb_bin.cp().bin([b]).process([p]).GetShapeWithUncertainty()
          rate = cmb_bin.cp().process([p]).backgrounds().GetRate() 
          err = cmb_bin.cp().bin(bins).backgrounds().GetUncertainty()
-         print 'W Bkg = %.1f +/- %.1f (%.3f)' % (rate, err, err/rate)
+         print('W Bkg = {rate}.1f +/- {err}.1f ({err/rate}.3f)')
       if args.datacard: shape = RestoreBinning(shape, ref)
       shape = shape.Rebin(len(common_bins)-1, '', common_bins)
       shape = ZeroErrors(shape) # zero errors to avoid confusion about what they represent
@@ -224,14 +224,14 @@ for bin in bins_grouped:
   shapes_sig[0].SetName('TotalSig')
   shapes_sig[0].Write('TotalSig')
 
-  print 'TotalSig = ', shapes_sig[0].Integral()
+  print('TotalSig = ', shapes_sig[0].Integral())
 
   # get total signal+background (note no uncertainties currently added for this)
 
   shapes_tot = []
   for b in bins:
     shape = cmb_bin.cp().bin([b]).GetShape()
-    print b, shape.Integral()
+    print(b, shape.Integral())
     if args.datacard: shape = RestoreBinning(shape, ref)
     shape = shape.Rebin(len(common_bins)-1, '', common_bins)
     shape = ZeroErrors(shape) # zero errors to avoid confusion about what they represent
@@ -274,9 +274,9 @@ for bin in bins_grouped:
     shape = shape.Rebin(len(common_bins)-1, '', common_bins)
     shapes_bkg[0]=shape.Clone()
 
-    print '!!!!', shapes_bkg[0].Integral()
+    print('!!!!', shapes_bkg[0].Integral())
     err = cmb_bin.cp().bin(bins).backgrounds().GetUncertainty()
-    print 'Total Bkg = %.1f +/- %.1f (%.3f)' % (rate, err, err/rate)
+    print(f'Total Bkg = {rate}.1f +/- {err}.1f ({err/rate}.3f)')
 
   # get total post error on background
   if args.postfit:
@@ -315,7 +315,7 @@ for bin in bins_grouped:
     cmb.UpdateParameters(res_backup)
   
     ave = (ave/float(samples))**.5
-    print 'Total Bkg = %.1f +/- %.1f (%.3f)' % (shapes_bkg[0].Integral(), ave, ave/shapes_bkg[0].Integral())
+    print(f'Total Bkg = {shapes_bkg[0].Integral()}.1f +/- {ave}.1f ({ave/shapes_bkg[0].Integral()}.3f)')
   
     # to get the final error we need to take the sqrt and divide by the number of samples
     for i in range(1, shapes_bkg[0].GetNbinsX()+1):
