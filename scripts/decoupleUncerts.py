@@ -1,3 +1,5 @@
+from os import remove
+import re
 import ROOT
 import math
 from array import array
@@ -29,16 +31,71 @@ if args.eras == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
 elif args.eras == '2022':
   eras = ['2022_preEE', '2022_postEE']
-elif args.eras == 'Run3_2022':
-  eras = ['Run3_2022']
+elif args.eras == 'Run3':
+  eras = ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']
 else:
   eras = args.eras.split(',')
 
 output_folder=args.output_folder
 
+def checkBins(graph, remove_bins=[]):
+    n_points = graph.GetN()
+    if n_points == 0:
+        print("Graph is empty, returning.")
+        return graph
+
+    # Step 1: Collect bin indices to remove
+    bins_to_remove = []
+    for i in range(n_points):
+        if graph.GetErrorYhigh(i) == graph.GetY()[i] or graph.GetErrorYlow(i) == graph.GetY()[i]:
+            bins_to_remove.append(i)
+
+    # Step 2: Append to remove_bins and remove duplicates
+    remove_bins.extend(bins_to_remove)
+    remove_bins = sorted(set(remove_bins))  # Remove duplicates and sort
+
+    return remove_bins
+
+
+def checkErrors(graph, remove_bins):
+    n_points = graph.GetN()
+    if n_points == 0:
+        print("Graph is empty, returning.")
+        return graph
+
+    for i in sorted(remove_bins, reverse=True):  # Reverse order to avoid index shifting
+        if i < graph.GetN():  # Ensure index is still valid after removals
+            graph.RemovePoint(i)
+            print(f'Removed point {i}')
+        else:
+            print(f'Skipping index {i}, out of bounds')
+
+    return graph
+
+
+def symmetriseBins(graph):
+    n_points = graph.GetN()
+    if n_points == 0:
+        print("Graph is empty, returning.")
+        return graph
+
+    # check the error of each bin, if the up error is the same as the central value, but the down error is not, then set the up error to be the same as the down error and vice versa
+    for i in range(n_points):
+        if graph.GetErrorYhigh(i) >= graph.GetY()[i] and graph.GetErrorYlow(i) < graph.GetY()[i]:
+            graph.SetPointEYhigh(i, graph.GetErrorYlow(i))
+
+        if graph.GetErrorYlow(i) >= graph.GetY()[i] and graph.GetErrorYhigh(i) < graph.GetY()[i]:
+            graph.SetPointEYlow(i, graph.GetErrorYhigh(i))
+
+    return graph
+
 
 def GraphDivideErrors(num, den):
     res = num.Clone()
+    n_res = res.GetN()
+    n_den = den.GetN()
+    print("Number of points in res:", n_res)
+    print("Number of points in den:", n_den)
     for i in range(num.GetN()):
         if type(res) is ROOT.TGraphAsymmErrors:
           if den.Eval(res.GetX()[i]) == 0:
@@ -224,10 +281,13 @@ def MakeUpAndDownVariations(g,guncert):
   gout_up = g.Clone()
   gout_down = g.Clone()
 
+
   for i in range(0,g.GetN()):
     g.GetPoint(i,x,y) 
     guncert.GetPoint(i,x_uncert,y_uncert)
 
+    print(g.GetN(), guncert.GetN())
+    print('x: %f, x_uncert: %f' % (x.value,x_uncert.value))
     if x_uncert.value != x.value:
       print('ERRROR: x bins values don\'t match!')
       exit() 
@@ -330,21 +390,33 @@ if args.dm_bins:
 #      if dm==1 and era != '2016_preVFP': fit_func='erf'
       graph_name = 'DM%(dm)s_%(era)s' % vars()
 
-      g=fout.Get(graph_name)
       if not gout5: systs = ['_syst_alleras', '_syst_%(era)s' % vars(),  '_syst_dm%(dm)s_%(era)s' % vars()]
       else: systs = ['_syst_alleras', '_syst_alldms_%(era)s' % vars()]
       systs_to_plot = []
 
+      g = fout.Get(graph_name)
+
+      remove_bins = []
+      remove_bins = checkBins(g,remove_bins)
+
+      for syst in systs:
+        guncert = fout.Get(graph_name+syst)
+        remove_bins = checkBins(guncert,remove_bins)
+
+
+      # now remove the bins from g
+      # g = checkErrors(g,remove_bins)
+      #g = symmetriseBins(g)
       for syst in systs:
         guncert=fout.Get(graph_name+syst)
-
+        # guncert = checkErrors(guncert,remove_bins)
         gr_up,gr_down=MakeUpAndDownVariations(g,guncert)
 
         fout.cd()
-        gr_up.Write() 
-        gr_down.Write() 
-  
-        fit_up, h_uncert_up, h_up, uncerts_up = FitSF(gr_up,func=fit_func) 
+        gr_up.Write()
+        gr_down.Write()
+
+        fit_up, h_uncert_up, h_up, uncerts_up = FitSF(gr_up,func=fit_func)
         fit_down, h_uncert_down, h_down, uncerts_down = FitSF(gr_down,func=fit_func)
 
         fit_up.Write()
@@ -378,10 +450,10 @@ if args.dm_bins:
           gr_nom=fout.Get(graph_name)
           gr_up.SetName(graph_name+'_TESUp_relative')
           gr_down.SetName(graph_name+'_TESDown_relative')
-          gr_up=GraphDivideErrors(gr_up,gr_nom) 
+          gr_up=GraphDivideErrors(gr_up,gr_nom)
           gr_down=GraphDivideErrors(gr_down,gr_nom)
-          gr_up.Write() 
-          gr_down.Write() 
+          gr_up.Write()
+          gr_down.Write()
 # erf works well for pol1 fits but for pol_order-2 can use same function
 #          fit_rel_up, h_uncert_up, h_up, uncerts_up = FitSF(gr_up,func='erf_rev')
 #          fit_rel_down, h_uncert_down, h_down, uncerts_down = FitSF(gr_down,func='erf')
@@ -408,29 +480,29 @@ if args.dm_bins:
       fit_nom.Write()
       h_uncert_nom.Write()
 
-      # we also fit the nominal SFs with a pol0 function for pT>40 to match the old prescription
-      g_pol0 = g.Clone()
-      g_pol0.SetName(g.GetName()+'_pol0_gt40')
-      # g_pol0
-      # loop over bins and print bin contents and errors
-      n_points = g_pol0.GetN()  # Number of points in the graph
+      # # we also fit the nominal SFs with a pol0 function for pT>40 to match the old prescription
+      # g_pol0 = g.Clone()
+      # g_pol0.SetName(g.GetName()+'_pol0_gt40')
+      # # g_pol0
+      # # loop over bins and print bin contents and errors
+      # n_points = g_pol0.GetN()  # Number of points in the graph
 
-      for i in range(n_points):
-          x = ctypes.c_double(0.0)
-          y = ctypes.c_double(0.0)
-          g_pol0.GetPoint(i, x, y)
-          err_x_low = g_pol0.GetErrorXlow(i)
-          err_x_high = g_pol0.GetErrorXhigh(i)
-          err_y_low = g_pol0.GetErrorYlow(i)
-          err_y_high = g_pol0.GetErrorYhigh(i)
+      # for i in range(n_points):
+      #     x = ctypes.c_double(0.0)
+      #     y = ctypes.c_double(0.0)
+      #     g_pol0.GetPoint(i, x, y)
+      #     err_x_low = g_pol0.GetErrorXlow(i)
+      #     err_x_high = g_pol0.GetErrorXhigh(i)
+      #     err_y_low = g_pol0.GetErrorYlow(i)
+      #     err_y_high = g_pol0.GetErrorYhigh(i)
 
-          print(f"Point {i}: X = {x.value:.4f} (+{err_x_high:.4f}, -{err_x_low:.4f}), "
-                f"Y = {y.value:.4f} (+{err_y_high:.4f}, -{err_y_low:.4f})")
-      # TODO: DANNY WHY? :(
-      fit_pol0, h_uncert_pol0, h_pol0, uncerts_pol0 = FitSF(g_pol0,func='pol1_gt40')
+      #     print(f"Point {i}: X = {x.value:.4f} (+{err_x_high:.4f}, -{err_x_low:.4f}), "
+      #           f"Y = {y.value:.4f} (+{err_y_high:.4f}, -{err_y_low:.4f})")
+      # # TODO: DANNY WHY? :(
+      # fit_pol0, h_uncert_pol0, h_pol0, uncerts_pol0 = FitSF(g_pol0,func='pol1_gt40')
 
-      fit_pol0.Write()
-      h_uncert_pol0.Write()
+      # fit_pol0.Write()
+      # h_uncert_pol0.Write()
 
       name = fit_nom.GetName()
 
@@ -458,7 +530,7 @@ if args.dm_bins:
         CompareSystsPlot(fit_nom,stats_to_plot,output_folder+'/'+'uncerts_stats_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
         dm_binned_strings[g.GetName()] = str(fit_nom.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
       if dm==2:
-        PlotSF(g, h_uncert_nom, 'tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name, title='#tau^{ #pm} #rightarrow #pi^{ #pm} #pi^{ #pm} #pi^{ 0} #nu_{#tau}, %(era)s' % vars(), output_folder=output_folder)
+        PlotSF(g, h_uncert_nom, 'tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name, title='#tau^{ #pm} #rightarrow #pi^{ #pm} #pi^{ 0} #pi^{ 0} #nu_{#tau}, %(era)s' % vars(), output_folder=output_folder)
         CompareSystsPlot(fit_nom,systs_to_plot,output_folder+'/'+'uncerts_systs_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
         CompareSystsPlot(fit_nom,stats_to_plot,output_folder+'/'+'uncerts_stats_tau_sf_DM%(dm)s_%(era)s' % vars()+extra_name)
         dm_binned_strings[g.GetName()] = str(fit_nom.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
@@ -513,3 +585,4 @@ with open(file_name, 'a') as file:
     else:
        file.write("\n%(wp)s" %vars())
     file.write('\nTotal chi2/NDF, p-value = %.2f/%.0f, %.10f ' % (tot_chi2, tot_ndf, p_value))
+

@@ -1,4 +1,3 @@
-import CombineHarvester.CombineTools.plotting as plot
 import ROOT
 import re
 import math
@@ -9,6 +8,7 @@ import sys
 import os
 import fnmatch
 from array import array
+import CombineHarvester.CombineTools.plotting as plot
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.TH1.AddDirectory(False)
@@ -177,7 +177,7 @@ def getHistogram(fname, histname, dirname='', postfitmode='prefit', allowEmpty=F
             return [histo,outname]
         elif isinstance(histo,ROOT.TDirectory) and dircheck:
             return getHistogram(histo,histname, allowEmpty=allowEmpty, logx=logx)
-    print 'Failed to find %(postfitmode)s histogram with name %(histname)s in file %(fname)s in directory %(dirname)s '%vars()
+    print('Failed to find %(postfitmode)s histogram with name %(histname)s in file %(fname)s in directory %(dirname)s '%vars())
     if allowEmpty:
         return [ROOT.TH1F('empty', '', 1, 0, 1), outname]
     else:
@@ -380,7 +380,7 @@ def main(args):
         outname=''
   
     if args.file:
-        print "Providing shape file: ", args.file, ", with specified subdir name: ", file_dir
+        print("Providing shape file: ", args.file, ", with specified subdir name: ", file_dir)
         shape_file=args.file
         shape_file_name=args.file
     
@@ -403,6 +403,13 @@ def main(args):
                 backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),
                 backgroundComp("Genuine #tau_{h}",["ZTT","TTT","VVT"],ROOT.TColor.GetColor(248,206,104)),
                 ],
+        'lt':[
+                backgroundComp("t#bar{t}",["TTJ"],ROOT.TColor.GetColor(155,152,204)),
+                backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
+                backgroundComp("Electroweak",["VVJ","W"],ROOT.TColor.GetColor(222,90,106)),
+                backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),
+                backgroundComp("Genuine #tau_{h}",["ZTT","TTT","VVT"],ROOT.TColor.GetColor(248,206,104)),
+                ],
         'zmm':[
                 backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
                 backgroundComp("t#bar{t}",["TTL","TTJ"],ROOT.TColor.GetColor(155,152,204)),
@@ -417,7 +424,7 @@ def main(args):
 
     file_dir_list = []
     file_dir_list = [file_dir]
-    print "%(log_x)s" %vars()
+    print("%(log_x)s" %vars())
     bkghist = getHistogram(histo_file,'TotalBkg',file_dir, mode, logx=log_x)[0]
     
     if not args.use_asimov:

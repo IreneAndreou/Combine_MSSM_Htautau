@@ -14,14 +14,15 @@ parser.add_argument('--saveJson', dest='saveJson', default=False, action='store_
 parser.add_argument('--file', '-f', help= 'File containing the output of MultiDimFit')
 parser.add_argument('-e', '--eras', dest='eras', type=str, default='UL', help="Eras to make plots of pT dependent SFs for; can be UL, 2022 or specific years")
 parser.add_argument('--wp', dest='wp', type=str, default='dummy_wp', help="The WP the SF are produced for (only used for storing json correctly)")
+parser.add_argument('--output_folder', type=str, help="path to output folder")
 #parser.add_argument('--pt_bins', dest='pt_bins', type=int, default='0', help="The pt bin being fitted")
 args = parser.parse_args()
 if args.eras == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
 elif args.eras == '2022':
   eras = ['2022_preEE', '2022_postEE']
-elif args.eras == 'Run3_2022':
-  eras = ['Run3_2022']
+elif args.eras == 'Run3':
+  eras = ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']
 else:
   eras = args.eras.split(',')
 
@@ -42,7 +43,7 @@ if dm_bins:
   'rate_tauSF_DM0_pT50to60_2017','rate_tauSF_DM0_pT60to80_2017','rate_tauSF_DM0_pT80to100_2017','rate_tauSF_DM0_pT100to200_2017','rate_tauSF_DM1_pT20to25_2017','rate_tauSF_DM1_pT25to30_2017','rate_tauSF_DM1_pT30to35_2017','rate_tauSF_DM1_pT35to40_2017','rate_tauSF_DM1_pT40to50_2017','rate_tauSF_DM1_pT50to60_2017','rate_tauSF_DM1_pT60to80_2017','rate_tauSF_DM1_pT80to100_2017','rate_tauSF_DM1_pT100to200_2017','rate_tauSF_DM10_pT20to25_2017','rate_tauSF_DM10_pT25to30_2017','rate_tauSF_DM10_pT30to35_2017','rate_tauSF_DM10_pT35to40_2017','rate_tauSF_DM10_pT40to50_2017','rate_tauSF_DM10_pT50to60_2017','rate_tauSF_DM10_pT60to80_2017','rate_tauSF_DM10_pT80to100_2017','rate_tauSF_DM10_pT100to200_2017','rate_tauSF_DM11_pT20to25_2017','rate_tauSF_DM11_pT25to30_2017','rate_tauSF_DM11_pT30to35_2017','rate_tauSF_DM11_pT35to40_2017','rate_tauSF_DM11_pT40to50_2017','rate_tauSF_DM11_pT50to60_2017','rate_tauSF_DM11_pT60to80_2017','rate_tauSF_DM11_pT80to100_2017','rate_tauSF_DM11_pT100to200_2017','rate_tauSF_DM0_pT20to25_2018','rate_tauSF_DM0_pT25to30_2018','rate_tauSF_DM0_pT30to35_2018','rate_tauSF_DM0_pT35to40_2018','rate_tauSF_DM0_pT40to50_2018','rate_tauSF_DM0_pT50to60_2018','rate_tauSF_DM0_pT60to80_2018','rate_tauSF_DM0_pT80to100_2018','rate_tauSF_DM0_pT100to200_2018','rate_tauSF_DM1_pT20to25_2018','rate_tauSF_DM1_pT25to30_2018','rate_tauSF_DM1_pT30to35_2018','rate_tauSF_DM1_pT35to40_2018','rate_tauSF_DM1_pT40to50_2018','rate_tauSF_DM1_pT50to60_2018','rate_tauSF_DM1_pT60to80_2018','rate_tauSF_DM1_pT80to100_2018','rate_tauSF_DM1_pT100to200_2018','rate_tauSF_DM10_pT20to25_2018','rate_tauSF_DM10_pT25to30_2018','rate_tauSF_DM10_pT30to35_2018','rate_tauSF_DM10_pT35to40_2018','rate_tauSF_DM10_pT40to50_2018','rate_tauSF_DM10_pT50to60_2018','rate_tauSF_DM10_pT60to80_2018','rate_tauSF_DM10_pT80to100_2018','rate_tauSF_DM10_pT100to200_2018','rate_tauSF_DM11_pT20to25_2018','rate_tauSF_DM11_pT25to30_2018','rate_tauSF_DM11_pT30to35_2018','rate_tauSF_DM11_pT35to40_2018','rate_tauSF_DM11_pT40to50_2018','rate_tauSF_DM11_pT50to60_2018','rate_tauSF_DM11_pT60to80_2018','rate_tauSF_DM11_pT80to100_2018','rate_tauSF_DM11_pT100to200_2018']
   if any(era in eras for era in ['2022_preEE', '2022_postEE']):
     pois = ['rate_tauSF_DM0_pT20to25_2022_preEE','rate_tauSF_DM0_pT25to30_2022_preEE','rate_tauSF_DM0_pT30to35_2022_preEE','rate_tauSF_DM0_pT35to40_2022_preEE','rate_tauSF_DM0_pT40to50_2022_preEE','rate_tauSF_DM0_pT50to60_2022_preEE','rate_tauSF_DM0_pT60to80_2022_preEE','rate_tauSF_DM0_pT80to100_2022_preEE','rate_tauSF_DM0_pT100to200_2022_preEE','rate_tauSF_DM1_pT20to25_2022_preEE','rate_tauSF_DM1_pT25to30_2022_preEE','rate_tauSF_DM1_pT30to35_2022_preEE','rate_tauSF_DM1_pT35to40_2022_preEE','rate_tauSF_DM1_pT40to50_2022_preEE','rate_tauSF_DM1_pT50to60_2022_preEE','rate_tauSF_DM1_pT60to80_2022_preEE','rate_tauSF_DM1_pT80to100_2022_preEE','rate_tauSF_DM1_pT100to200_2022_preEE','rate_tauSF_DM10_pT20to25_2022_preEE','rate_tauSF_DM10_pT25to30_2022_preEE','rate_tauSF_DM10_pT30to35_2022_preEE','rate_tauSF_DM10_pT35to40_2022_preEE','rate_tauSF_DM10_pT40to50_2022_preEE','rate_tauSF_DM10_pT50to60_2022_preEE','rate_tauSF_DM10_pT60to80_2022_preEE','rate_tauSF_DM10_pT80to100_2022_preEE','rate_tauSF_DM10_pT100to200_2022_preEE','rate_tauSF_DM11_pT20to25_2022_preEE','rate_tauSF_DM11_pT25to30_2022_preEE','rate_tauSF_DM11_pT30to35_2022_preEE','rate_tauSF_DM11_pT35to40_2022_preEE','rate_tauSF_DM11_pT40to50_2022_preEE','rate_tauSF_DM11_pT50to60_2022_preEE','rate_tauSF_DM11_pT60to80_2022_preEE','rate_tauSF_DM11_pT80to100_2022_preEE','rate_tauSF_DM11_pT100to200_2022_preEE','rate_tauSF_DM0_pT20to25_2022_postEE','rate_tauSF_DM0_pT25to30_2022_postEE','rate_tauSF_DM0_pT30to35_2022_postEE','rate_tauSF_DM0_pT35to40_2022_postEE','rate_tauSF_DM0_pT40to50_2022_postEE','rate_tauSF_DM0_pT50to60_2022_postEE','rate_tauSF_DM0_pT60to80_2022_postEE','rate_tauSF_DM0_pT80to100_2022_postEE','rate_tauSF_DM0_pT100to200_2022_postEE','rate_tauSF_DM1_pT20to25_2022_postEE','rate_tauSF_DM1_pT25to30_2022_postEE','rate_tauSF_DM1_pT30to35_2022_postEE','rate_tauSF_DM1_pT35to40_2022_postEE','rate_tauSF_DM1_pT40to50_2022_postEE','rate_tauSF_DM1_pT50to60_2022_postEE','rate_tauSF_DM1_pT60to80_2022_postEE','rate_tauSF_DM1_pT80to100_2022_postEE','rate_tauSF_DM1_pT100to200_2022_postEE','rate_tauSF_DM10_pT20to25_2022_postEE','rate_tauSF_DM10_pT25to30_2022_postEE','rate_tauSF_DM10_pT30to35_2022_postEE','rate_tauSF_DM10_pT35to40_2022_postEE','rate_tauSF_DM10_pT40to50_2022_postEE','rate_tauSF_DM10_pT50to60_2022_postEE','rate_tauSF_DM10_pT60to80_2022_postEE','rate_tauSF_DM10_pT80to100_2022_postEE','rate_tauSF_DM10_pT100to200_2022_postEE','rate_tauSF_DM11_pT20to25_2022_postEE','rate_tauSF_DM11_pT25to30_2022_postEE','rate_tauSF_DM11_pT30to35_2022_postEE','rate_tauSF_DM11_pT35to40_2022_postEE','rate_tauSF_DM11_pT40to50_2022_postEE','rate_tauSF_DM11_pT50to60_2022_postEE','rate_tauSF_DM11_pT60to80_2022_postEE','rate_tauSF_DM11_pT80to100_2022_postEE','rate_tauSF_DM11_pT100to200_2022_postEE']
-  if any(era in eras for era in ['Run3_2022']):
+  if any(era in eras for era in ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']):
 
     pois = []
 
@@ -104,7 +105,6 @@ graph_values = {}
 sf_map = {}
 
 for e in eras:
-
 
   if dm_bins:
     for dm in [0,1,2,10,11]: graph_values['%i_%s' % (dm,e)] = []
@@ -177,13 +177,23 @@ for g_val in graph_values:
 
   gr = ROOT.TGraphAsymmErrors()
   gr.SetName('DM%s' % g_val)
+
   for x in graph_values[g_val]:
+    nominal_value = x[1]
+    y_err_low = x[2]
+    y_err_high = x[3]
+
+    if abs(y_err_low) >= abs(nominal_value) or abs(y_err_high) >= abs(nominal_value):
+      continue
+
     n=gr.GetN()
-    gr.SetPoint(n,x[0], x[1])
-    gr.SetPointError (n, x[4], x[4], x[2], x[3]) 
+    gr.SetPoint(n, x[0], nominal_value)
+    gr.SetPointError(n, x[4], x[4], y_err_low, y_err_high)
+
     bini = h.FindBin(x[0])
-    h.SetBinContent(bini, x[1])
-    h.SetBinError(bini, max(x[2],x[3])) # set histogram error to maximum of the up and down
+    h.SetBinContent(bini, nominal_value)
+    h.SetBinError(bini, max(y_err_low, y_err_high)) # set histogram error to maximum of the up and down
+
   fout.cd()
   gr.Write()
   h.Write()
@@ -204,7 +214,7 @@ for g_val in graph_values:
     x[2].Write() 
 
   dm_binned_strings[gr.GetName()] = str(fit.GetExpFormula('p')).replace('x','min(max(pt_2,20.),140.)')
-  PlotSF(gr, h_uncert, 'fit_'+gr.GetName(), title=gr.GetName(), output_folder='./')
+  PlotSF(gr, h_uncert, 'fit_'+gr.GetName(), title=gr.GetName(), output_folder=args.output_folder)
 
 
 if dm_bins:
@@ -219,7 +229,7 @@ if dm_bins:
     print(out)
 
 if args.saveJson:
-  if dm_bins: json_out_name = 'tau_SF_strings_dm_binned_%(wp)s.json' % vars()
-  else: json_out_name = 'tau_SF_strings_pt_binned_%(wp)s.json' % vars()
+  if dm_bins: json_out_name = args.output_folder+'tau_SF_strings_dm_binned_%(wp)s.json' % vars()
+  else: json_out_name = args.output_folder+'tau_SF_strings_pt_binned_%(wp)s.json' % vars()
   with open(json_out_name, 'w') as fp:
     json.dump(sf_map, fp, sort_keys=True, indent=4)

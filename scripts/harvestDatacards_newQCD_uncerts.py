@@ -6,7 +6,7 @@ import yaml
 #import os
 
 # specify with eras to fit or combine all eras together by specifying "all"
-valid_eras = ['2016_preVFP', '2016_postVFP', '2017', '2018', 'UL', 'Run3_2022', '2022']
+valid_eras = ['2016_preVFP', '2016_postVFP', '2017', '2018', 'UL', 'Run3_2022', 'Run3_2022EE','Run3_2023','Run3_2023BPix','Run3']
 
 # HI
 description = '''This script makes datacards with CombineHarvester for performing tau ID SF measurments.'''
@@ -42,8 +42,8 @@ if args.eras:
 
 if era_tag == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
-elif era_tag == '2022':
-  eras = ['Run3_2022']
+elif era_tag == 'Run3':
+  eras = ['Run3_2022', 'Run3_2022EE','Run3_2023','Run3_2023BPix']
 else:
   eras = era_tag.split(',')
 
@@ -96,10 +96,7 @@ sig_procs = ['ZTT','VVT','TTT']
 cats = {}
 cats['mm'] = [(0, 'mm_inclusive')]
 
-if tightVsEle:
-  cat_extra='_tightVsEle'
-else:
-  cat_extra=''
+cat_extra=''
 
 cr_bins=[]
 qcd_cr_bins=[]
@@ -241,7 +238,7 @@ cb.cp().channel(['mt']).process(['ZL']).bin_id(dm1_bins+inclusive_bins).AddSyst(
 cb.cp().channel(['mt']).process(['ZL']).bin_id(dm2_bins+inclusive_bins).AddSyst(cb, "CMS_scale_mu_1prong2pizero_$ERA", "shape", ch.SystMap()(1.00))
 
 #MET related uncertainties
-if any(era in eras for era in ['2016_preVFP', '2016_postVFP', '2017', '2018','Run3_2022']):
+if any(era in eras for era in ['2016_preVFP', '2016_postVFP', '2017', '2018','Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']):
   cb.cp().channel(['mt']).process(['QCD'],False).AddSyst(cb, "CMS_res_j_$ERA", "shape", ch.SystMap()(1.00))
   cb.cp().channel(['mt']).process(['QCD'],False).AddSyst(cb, "CMS_scale_j_$ERA", "shape", ch.SystMap()(1.00))
 
@@ -262,7 +259,7 @@ if any(era in eras for era in ['2016_preVFP', '2016_postVFP', '2017', '2018']):
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm11_bins).AddSyst(cb, "CMS_l_fake_t_DM11", "lnN", ch.SystMap()(1.3))
   # add a part decoupled by pT/DM bin
   cb.cp().channel(['mt']).process(['ZL']).AddSyst(cb, "CMS_l_fake_t_$BIN_$ERA", "lnN", ch.SystMap()(1.3))
-if any(era in eras for era in ['Run3_2022']):
+if any(era in eras for era in ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']):
   cb.cp().channel(['mt']).process(['ZL']).bin_id(inclusive_bins).AddSyst(cb, "CMS_l_fake_t", "lnN", ch.SystMap()(1.5))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM0", "lnN", ch.SystMap()(1.5))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM1", "lnN", ch.SystMap()(1.5))
@@ -411,9 +408,9 @@ for era in eras:
 for chn in channels:
   for era in eras:
     if chn=='mm':
-      filename = 'shapes/ztt.datacard.m_vis.%s.%s.%s.root' % (chn,era,wp)
+      filename = 'shapes/ztt.datacard.m_vis.%s.%s.root' % (chn,era)
     else:
-      filename = 'shapes/ztt.datacard.m_vis.%s.%s.%s.root' % (chn,era,wp)
+      filename = 'shapes/ztt.datacard.m_vis.%s.%s.vsJet%s.vsEle%s.root' % (chn,era,wp,vsele_wp)
     print(">>>   file " + filename)
     print('%s, %s' % (chn, era))
     cb.cp().channel([chn]).process(bkg_procs[chn]).era([era]).ExtractShapes(filename, "$BIN/$PROCESS", "$BIN/$PROCESS_$SYSTEMATIC")
@@ -484,7 +481,7 @@ for b in cb.cp().channel(['mt']).bin_id(cr_bins,True).bin_set():
 cb.cp().channel(['mm']).syst_type(["shape"]).ForEachSyst(lambda sys: sys.set_type('lnN'))
 cb.cp().channel(['mt']).bin_id(cr_bins).syst_type(["shape"]).ForEachSyst(lambda sys: sys.set_type('lnN'))
 for era in eras:
-  if era == "Run3_2022" or era == "Run3_2022":
+  if era == "Run3_2022" or era == "Run3_2022EE" or era == "Run3_2023" or era == "Run3_2023BPix":
     cb.cp().channel(['mt']).syst_name(['CMS_scale_j_%s' % era,'CMS_res_j_%s' % era]).syst_type(["shape"]).ForEachSyst(lambda sys: sys.set_type('lnN'))
   else:
     cb.cp().channel(['mt']).syst_name(['CMS_scale_j_%s' % era,'CMS_res_j_%s' % era, 'CMS_scale_met_unclustered_%s' % era]).syst_type(["shape"]).ForEachSyst(lambda sys: sys.set_type('lnN'))
@@ -521,7 +518,7 @@ else:
   extra_systs = ''
 
 if not dm_bins:
-  if any(era in eras for era in ['Run3_2022', 'Run3_2022EE']):
+  if any(era in eras for era in ['Run3_2022', 'Run3_2022EE', 'Run3_2023', 'Run3_2023BPix']):
     cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t CMS_l_fake_t CMS_scale_jfake"+extra_systs)
     # add a group for systematics that are correlated by bins (excluding the uncertainties from the bins and eras group)
     systs_for_group = ["CMS_scale_t_1prong", "CMS_scale_t_1prong1pizero", "CMS_scale_t_3prong", "CMS_scale_t_3prong1pizero", "CMS_scale_mu_1prong", "CMS_scale_mu_1prong1pizero", "CMS_scale_mu_1prong2pizero", "CMS_res_j", "rate_DY", "CMS_scale_jfake"]
@@ -531,7 +528,7 @@ if not dm_bins:
   if not useCRs:
     systs_for_group+=["rate_QCD", "rate_W"]
 else:
-  if any(era in eras for era in ['Run3_2022', 'Run3_2022EE']):
+  if any(era in eras for era in ['Run3_2022', 'Run3_2022EE', 'Run3_2023', 'Run3_2023BPix']):
     cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t_DM0 CMS_j_fake_t_DM1 CMS_j_fake_t_DM10 CMS_j_fake_t_DM11 CMS_l_fake_t_DM0 CMS_l_fake_t_DM1 CMS_l_fake_t_DM10 CMS_l_fake_t_DM11 CMS_scale_jfake_DM0 CMS_scale_jfake_DM1 CMS_scale_jfake_DM10 CMS_scale_jfake_DM11"+extra_systs)
     # add a group for systematics that are correlated by bins (excluding the uncertainties from the bins and eras group)
     systs_for_group = ["CMS_res_j", "rate_DY"]

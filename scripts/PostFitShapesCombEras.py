@@ -1,13 +1,11 @@
-#!/usr/bin/env python
-
+import numpy as np
+import array
+from numpy import arange
+import ROOT; ROOT.PyConfig.IgnoreCommandLineOptions = True
 import CombineHarvester.CombineTools.ch as ch
-import ROOT
 import sys
 import argparse
 from itertools import groupby
-from numpy import arange
-import array
-import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--fitresult', '-f', help= 'Path to a RooFitResult, only needed for postfit')

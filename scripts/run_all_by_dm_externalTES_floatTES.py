@@ -33,8 +33,8 @@ if args.eras == 'UL':
   eras = ['2016_preVFP', '2016_postVFP', '2017', '2018'] # add other eras later
 elif args.eras == '2022':
   eras = ['2022_preEE', '2022_postEE']
-elif args.eras == 'Run3_2022':
-  eras = ['Run3_2022']
+elif args.eras == 'Run3':
+  eras = ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']
 else:
   eras=args.eras.split(',')
 
@@ -49,7 +49,10 @@ if not os.path.exists(f'outputs/{output_dir}'):
 
 if 'harvest' in args.step or args.step == "all":
   # make text datacards
-  os.system(f'python3 scripts/harvestDatacards_newQCD_uncerts.py --dm-bins -o outputs/{output_dir} --wp {args.wp} --useCRs -e {args.eras}')
+  if args.tightVsEle:
+    os.system(f'python3 scripts/harvestDatacards_newQCD_uncerts.py --dm-bins -o outputs/{output_dir} --wp {args.wp} --useCRs -e {args.eras} --tightVsEle')
+  else:
+    os.system(f'python3 scripts/harvestDatacards_newQCD_uncerts.py --dm-bins -o outputs/{output_dir} --wp {args.wp} --useCRs -e {args.eras}')
 
 if 'ws' in args.step or args.step == "all":
   # make workspaces
@@ -135,7 +138,7 @@ if 'fit' in args.step or args.step == "all":
   for year in eras:
     fout = ROOT.TFile(
         f"outputs/{output_dir}/cmb/TauES_dm_DeepTau2018v2p5VSjet_{year}_VSjet{args.wp.capitalize()}_VSele"
-        f"{'Tight' if args.tightVsEle else 'VVLoose'}.root",
+        f"{'Tight' if args.tightVsEle else 'VLoose'}.root",
         "RECREATE"
     )
     h = ROOT.TH1D('tes','tes',12,0,12)
@@ -164,7 +167,7 @@ if 'fit' in args.step or args.step == "all":
   #now run fit with TES values fixed for nominal SFs
   print("Running nominal fit")
 
-  os.system('combineTool.py -m 125 -M MultiDimFit --redefineSignalPOIs \"%(pois_str)s\" --X-rtd MINIMIZER_analytic --expectSignal 0 --cminDefaultMinimizerStrategy 0 --cminDefaultMinimizerTolerance 0.1 --algo singles --cl=0.68 --there -d outputs/%(output_dir)s/cmb/higgsCombine.ztt.bestfit.singles.MultiDimFit.mH125.root -n ".ztt.bestfit.singles.postfit" --snapshotName MultiDimFit --freezeNuisanceGroups TES %(tes_ranges_str)s --setParameters %(tes_nom_str)s' % vars())
+  os.system('combineTool.py -m 125 -M MultiDimFit --redefineSignalPOIs \"%(pois_str)s\" --X-rtd MINIMIZER_analytic --expectSignal 0 --cminDefaultMinimizerStrategy 0 --cminDefaultMinimizerTolerance 0.1 --algo singles --cl=0.68 --there -d outputs/%(output_dir)s/cmb/higgsCombine.ztt.bestfit.singles.MultiDimFit.mH125.root -n ".ztt.bestfit.singles.postfit" --snapshotName MultiDimFit --freezeNuisanceGroups TES %(tes_ranges_str)s --setParameters %(tes_nom_str)s -v 9' % vars())
 
   # now run fits with TES values fixed to +/- 1 sigma for uncertainty variations
 
@@ -210,10 +213,10 @@ if "plot" in args.step or args.step == "all":
   if args.tightVsEle:
     json_out="--saveJson --wp=%svsjet_tightvsele" % args.wp
   else:
-    json_out="--saveJson --wp=%svsjet_vvloosevsele" % args.wp
+    json_out="--saveJson --wp=%svsjet_vloosevsele" % args.wp
 
   for v in variations:
-    os.system('python3 scripts/makeSFGraphs.py  -f outputs/%s/cmb/higgsCombine.ztt.bestfit.singles.postfit%s.MultiDimFit.mH125.root --dm-bins %s %s' %(output_dir, v, json_out, eras_str))
+    os.system('python3 scripts/makeSFGraphs.py  -f outputs/%s/cmb/higgsCombine.ztt.bestfit.singles.postfit%s.MultiDimFit.mH125.root --dm-bins %s %s --output_folder outputs/%s/' %(output_dir, v, json_out, eras_str,output_dir))
 
   dir_name='outputs/%(output_dir)s/cmb/' % vars()
   for extra in ['','--split-fit']:
