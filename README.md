@@ -47,7 +47,7 @@ cp -r directory_with_datacards/ datacards/
 
 ```bash
 mkdir shapes
-cp -r datacards/your_mm_path/ shapes/
+cp -r datacards/your_mm_path/year/datacard_name.root shapes/ztt.datacard.m_vis.mm.year.root
 ```
 
 ### hadd mt datacards (mt) placing them in shapes directory
