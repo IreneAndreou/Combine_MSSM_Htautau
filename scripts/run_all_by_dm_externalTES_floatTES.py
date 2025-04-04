@@ -107,11 +107,10 @@ if 'fit' in args.step or args.step == "all":
         vals[poi_].add(x)
         # the factors must be set equal to the sie of the 1-sigma uncertainties for the TES parameters
         # 2% for DM=11, or 1.5% for the other DMs
-      if '3prong1pizero' in poi_:
-        factor=0.02
-      else:
-        factor=0.015
+      factor=0.02
       tes_actual_vals[poi_]= format(1.+sorted(list(vals[poi_]))[1]*factor, ".3f")
+      if poi_ == f"CMS_scale_t_1prong_{year}":
+        tes_actual_vals[poi_]= format(float(tes_actual_vals[poi_]) - 0.07, ".3f")
       tes_nom_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1])
       tes_down_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]-1.)
       tes_up_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]+1.)
