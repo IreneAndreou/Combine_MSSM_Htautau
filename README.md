@@ -25,12 +25,13 @@ scram b
 ### Clone tauSF repository:
 
 ```bash
-git clone --branch CMSSW_14_X-PnetDM git@github.com:Ksavva1021/TauSF.git CombineHarvester/TauSF
+git clone --branch CMSSW_14_X-PnetDM git@github.com:Ksavva1021/TauSF.git TauSF
 ```
 
 compile:
 
 ```bash
+cd TauSF/
 scram b clean
 scram b -j8
 ```
