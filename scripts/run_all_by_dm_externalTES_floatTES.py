@@ -66,12 +66,8 @@ if 'fit' in args.step or args.step == "all":
     for year in eras:
       # we have to make sure the range is sufficient to allow for a nominal value !=0
       # allowing ranges between -2 and 2 sigma should guarentee this - if pulls are larger then 2 sigma then the fit result might not be physical anyway so should be carefully checked
-      if p == "CMS_scale_t_1prong_$YEAR":
-        tes_ranges_str+='%s=-4,4:' % (p.replace('$YEAR',year))
-        tes_pois_str+='%s,' % (p.replace('$YEAR',year))
-      else:
-        tes_ranges_str+='%s=-2,2:' % (p.replace('$YEAR',year))
-        tes_pois_str+='%s,' % (p.replace('$YEAR',year))
+      tes_ranges_str+='%s=-2,2:' % (p.replace('$YEAR',year))
+      tes_pois_str+='%s,' % (p.replace('$YEAR',year))
 
   pois_str=''
   for p in pois:
