@@ -64,5 +64,5 @@ If you are starting from 2D histograms in bins of pT vs m_vis these must first b
 Run this script to split the datacards:
 
 ```bash
-python scripts/convertDatacards.py -f shapes/ztt.datacard.pt_2_vs_m_vis.mt.2017.root
+python3 scripts/convertDatacards.py -f shapes/ztt.datacard.pt_2_vs_m_vis.mt.your_datacard_suffixes.root
 ```
