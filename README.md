@@ -43,14 +43,16 @@ mkdir datacards
 cp -r directory_with_datacards/ datacards/
 ```
 
-### Copy mm datacards over to shapes directory
+### Copy mm and mt datacards over to shapes directory
 
 ```bash
 mkdir shapes
 cp -r datacards/your_mm_path/year/datacard_name.root shapes/ztt.datacard.m_vis.mm.year.root
+
+cp -r datacards/your_mt_path/year/datacard_name.root shapes/
 ```
 
-### hadd mt datacards (mt) placing them in shapes directory
+### hadd mt datacards placing them in shapes directory
 
 ```bash
 hadd -f shapes/ztt.datacard.pt_2_vs_m_vis.mt.Run3_2022.vsJetVTight.vsEleVVLoose.root /vols/cms/ks1021/TauSF/CMSSW_14_1_0_pre4/src/CombineHarvester/TauSF/datacards/Run3_2022/sf_calculation/mt/*.root
