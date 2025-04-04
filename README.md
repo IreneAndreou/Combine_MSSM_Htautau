@@ -46,7 +46,8 @@ cp -r directory_with_datacards/ datacards/
 ### Copy mm datacards over to shapes directory
 
 ```bash
-cp -r datacards/your_mm_path/ datacards/
+mkdir shapes
+cp -r datacards/your_mm_path/ shapes/
 ```
 
 ### hadd mt datacards (mt) placing them in shapes directory
