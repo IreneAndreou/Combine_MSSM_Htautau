@@ -254,7 +254,7 @@ cb.cp().channel(['mt']).process(['TTJ','VVJ','ZJ']).AddSyst(cb, "CMS_j_fake_t_$B
 if any(era in eras for era in ['2016_preVFP', '2016_postVFP', '2017', '2018']):
   cb.cp().channel(['mt']).process(['ZL']).bin_id(inclusive_bins).AddSyst(cb, "CMS_l_fake_t", "lnN", ch.SystMap()(1.3))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM0", "lnN", ch.SystMap()(1.3))
-  cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM1", "lnN", ch.SystMap()(1.3))
+  cb.cp().channel(['mt']).process(['ZL']).bin_id(dm1_bins).AddSyst(cb, "CMS_l_fake_t_DM1", "lnN", ch.SystMap()(1.3))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm10_bins).AddSyst(cb, "CMS_l_fake_t_DM10", "lnN", ch.SystMap()(1.3))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm11_bins).AddSyst(cb, "CMS_l_fake_t_DM11", "lnN", ch.SystMap()(1.3))
   # add a part decoupled by pT/DM bin
@@ -262,7 +262,8 @@ if any(era in eras for era in ['2016_preVFP', '2016_postVFP', '2017', '2018']):
 if any(era in eras for era in ['Run3_2022','Run3_2022EE','Run3_2023','Run3_2023BPix']):
   cb.cp().channel(['mt']).process(['ZL']).bin_id(inclusive_bins).AddSyst(cb, "CMS_l_fake_t", "lnN", ch.SystMap()(1.5))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM0", "lnN", ch.SystMap()(1.5))
-  cb.cp().channel(['mt']).process(['ZL']).bin_id(dm0_bins).AddSyst(cb, "CMS_l_fake_t_DM1", "lnN", ch.SystMap()(1.5))
+  cb.cp().channel(['mt']).process(['ZL']).bin_id(dm1_bins).AddSyst(cb, "CMS_l_fake_t_DM1", "lnN", ch.SystMap()(1.5))
+  cb.cp().channel(['mt']).process(['ZL']).bin_id(dm2_bins).AddSyst(cb, "CMS_l_fake_t_DM2", "lnN", ch.SystMap()(1.5))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm10_bins).AddSyst(cb, "CMS_l_fake_t_DM10", "lnN", ch.SystMap()(1.5))
   cb.cp().channel(['mt']).process(['ZL']).bin_id(dm11_bins).AddSyst(cb, "CMS_l_fake_t_DM11", "lnN", ch.SystMap()(1.5))
   # add a part decoupled by pT/DM bin
@@ -521,7 +522,7 @@ if not dm_bins:
   if any(era in eras for era in ['Run3_2022', 'Run3_2022EE', 'Run3_2023', 'Run3_2023BPix']):
     cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t CMS_l_fake_t CMS_scale_jfake"+extra_systs)
     # add a group for systematics that are correlated by bins (excluding the uncertainties from the bins and eras group)
-    systs_for_group = ["CMS_scale_t_1prong", "CMS_scale_t_1prong1pizero", "CMS_scale_t_3prong", "CMS_scale_t_3prong1pizero", "CMS_scale_mu_1prong", "CMS_scale_mu_1prong1pizero", "CMS_scale_mu_1prong2pizero", "CMS_res_j", "rate_DY", "CMS_scale_jfake"]
+    systs_for_group = ["CMS_scale_t_1prong", "CMS_scale_t_1prong1pizero", "CMS_scale_t_1prong2pizero", "CMS_scale_t_3prong", "CMS_scale_t_3prong1pizero", "CMS_scale_mu_1prong", "CMS_scale_mu_1prong1pizero", "CMS_scale_mu_1prong2pizero", "CMS_res_j", "CMS_scale_j", "rate_DY", "CMS_scale_jfake"]
   else:
     cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_scale_j_Absolute CMS_scale_j_BBEC1 CMS_scale_j_EC2 CMS_scale_j_FlavorQCD CMS_scale_j_HF CMS_scale_j_RelativeBal CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t CMS_l_fake_t CMS_scale_jfake"+extra_systs)
     systs_for_group = ["CMS_scale_t_1prong", "CMS_scale_t_1prong1pizero", "CMS_scale_t_3prong", "CMS_scale_t_3prong1pizero", "CMS_ZLShape_mt_1prong", "CMS_ZLShape_mt_1prong1pizero", "CMS_res_j", "CMS_scale_met_unclustered", "CMS_scale_j_Absolute_year", "CMS_scale_j_BBEC1_year", "CMS_scale_j_EC2_year", "CMS_scale_j_HF_year", "CMS_scale_j_RelativeSample_year", "rate_DY", "CMS_scale_jfake"]
@@ -529,9 +530,9 @@ if not dm_bins:
     systs_for_group+=["rate_QCD", "rate_W"]
 else:
   if any(era in eras for era in ['Run3_2022', 'Run3_2022EE', 'Run3_2023', 'Run3_2023BPix']):
-    cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t_DM0 CMS_j_fake_t_DM1 CMS_j_fake_t_DM10 CMS_j_fake_t_DM11 CMS_l_fake_t_DM0 CMS_l_fake_t_DM1 CMS_l_fake_t_DM10 CMS_l_fake_t_DM11 CMS_scale_jfake_DM0 CMS_scale_jfake_DM1 CMS_scale_jfake_DM10 CMS_scale_jfake_DM11"+extra_systs)
+    cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t_DM0 CMS_j_fake_t_DM1 CMS_j_fake_t_DM2 CMS_j_fake_t_DM10 CMS_j_fake_t_DM11 CMS_l_fake_t_DM0 CMS_l_fake_t_DM1 CMS_l_fake_t_DM2 CMS_l_fake_t_DM10 CMS_l_fake_t_DM11 CMS_scale_jfake_DM0 CMS_scale_jfake_DM1 CMS_scale_jfake_DM2 CMS_scale_jfake_DM10 CMS_scale_jfake_DM11"+extra_systs)
     # add a group for systematics that are correlated by bins (excluding the uncertainties from the bins and eras group)
-    systs_for_group = ["CMS_res_j", "rate_DY"]
+    systs_for_group = ["CMS_res_j", "CMS_scale_j","rate_DY"]
   else:
     cb.AddDatacardLineAtEnd("byErasAndBins group = CMS_eff_m CMS_scale_j_Absolute CMS_scale_j_BBEC1 CMS_scale_j_EC2 CMS_scale_j_FlavorQCD CMS_scale_j_HF CMS_scale_j_RelativeBal CMS_j_fake_m CMS_htt_vvXsec CMS_htt_tjXsec CMS_htt_dyShape CMS_htt_ttbarShape CMS_j_fake_t_DM0 CMS_j_fake_t_DM1 CMS_j_fake_t_DM10 CMS_j_fake_t_DM11 CMS_l_fake_t_DM0 CMS_l_fake_t_DM1 CMS_l_fake_t_DM10 CMS_l_fake_t_DM11 CMS_scale_jfake_DM0 CMS_scale_jfake_DM1 CMS_scale_jfake_DM10 CMS_scale_jfake_DM11"+extra_systs)
     systs_for_group = ["CMS_res_j", "CMS_scale_met_unclustered", "CMS_scale_j_Absolute_year", "CMS_scale_j_BBEC1_year", "CMS_scale_j_EC2_year", "CMS_scale_j_HF_year", "CMS_scale_j_RelativeSample_year", "rate_DY"]
