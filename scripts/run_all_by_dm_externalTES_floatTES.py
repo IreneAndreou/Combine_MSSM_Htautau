@@ -106,14 +106,21 @@ if 'fit' in args.step or args.step == "all":
         x=getattr(l, poi_)
         vals[poi_].add(x)
         # the factors must be set equal to the sie of the 1-sigma uncertainties for the TES parameters
-        # 2% for DM=11, or 1.5% for the other DMs
+        # 2% shift wrt nominal is baseline for all DMs in HiggsDNA
       factor=0.02
       tes_actual_vals[poi_]= format(1.+sorted(list(vals[poi_]))[1]*factor, ".3f")
       if poi_ == f"CMS_scale_t_1prong_{year}":
         tes_actual_vals[poi_]= format(float(tes_actual_vals[poi_]) - 0.07, ".3f")
       tes_nom_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1])
-      tes_down_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]-1.)
-      tes_up_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]+1.)
+      if (poi_ == f"CMS_scale_t_1prong_{year}") or (poi_ == f"CMS_scale_t_3prong1pizero_{year}"):
+        # want a +/- 2% shift for DM0 and DM11 -> 1 sigma
+        tes_down_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]-1.)
+        tes_up_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]+1.)
+      else:
+        # want a +/- 1.5% shift for DM1, DM2 and DM10 -> 0.75 sigma
+        tes_down_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]-0.75)
+        tes_up_str+='%s=%.4f,' % (poi_,sorted(list(vals[poi_]))[1]+0.75)
+
 
       #if any up (down) TES uncertainties are larger than +2 (smaller than -2) sigma we need to adjust the range for the parameters as well otherwise they will get clipped at the boundary
       if sorted(list(vals[poi_]))[1]-1. < -2 or sorted(list(vals[poi_]))[1]+1. > 2:
