@@ -336,7 +336,8 @@ def main(args):
         lumi = "27.0 fb^{-1} (13.6 TeV)"
     elif era == "2022":
         lumi = "35.08 fb^{-1} (13.6 TeV)"
-
+    else:
+        lumi = era
     plot.ModTDRStyle(width=1800, height=700, r=0.4, l=0.16, t=0.12,b=0.15)
     ROOT.TGaxis.SetExponentOffset(-0.06, 0.01, "y")
     # Channel & Category label
@@ -345,6 +346,8 @@ def main(args):
         args.channel = args.file_dir.split("_")[1]
     if args.channel == "tt":
         channel_label = "#tau_{h}#tau_{h}"
+    if args.channel == 'mm':
+        channel_label = "#mu_{}#mu_{}"
     if args.channel == "lt":
         channel_label = "#mu_{}#tau_{h}+e_{}#tau_{h}"
     if args.channel == "mt":
@@ -410,7 +413,7 @@ def main(args):
                 backgroundComp("Z#rightarrow#mu#mu",["ZL","ZJ"],ROOT.TColor.GetColor(100,192,232)),
                 backgroundComp("Genuine #tau_{h}",["ZTT","TTT","VVT"],ROOT.TColor.GetColor(248,206,104)),
                 ],
-        'zmm':[
+        'mm':[
                 backgroundComp("QCD", ["QCD"], ROOT.TColor.GetColor(250,202,255)),
                 backgroundComp("t#bar{t}",["TTL","TTJ"],ROOT.TColor.GetColor(155,152,204)),
                 backgroundComp("Electroweak",["VVL","VVJ","W"],ROOT.TColor.GetColor(222,90,106)),
@@ -494,6 +497,8 @@ def main(args):
     
     #Create stacked plot for the backgrounds
     bkg_histos = []
+
+    integral_raw = {}
     for i,t in enumerate(background_schemes[channel]):
         plots = t['plot_list']
         isHist = False
@@ -507,6 +512,9 @@ def main(args):
                 if getHistogram(histo_file,k, file_dir,mode, False, logx=log_x) is not None:
                     isHist = True
                     h.Add(getHistogram(histo_file,k, file_dir,mode,logx=log_x)[0])
+        print(h.GetName())
+        integral_raw[h.GetName()] = h.Integral()
+        print(f"Integral KSVAVAASADV: {h.Integral()}")
         h.SetFillColor(t['colour'])
         h.SetLineColor(ROOT.kBlack)
         h.SetMarkerSize(0)
@@ -604,6 +612,20 @@ def main(args):
         bkghist.SetLineColor(0)    
 
         stack.Draw("histsame")
+
+        integrals = []
+        integral_names = []
+        stack_hist_list = stack.GetHists()
+        for rip in range(stack_hist_list.GetSize()):
+            h = stack_hist_list.At(rip)
+            print(f"{h.GetName()} → {h.Integral():.2f}")
+            integrals.append(h.Integral())
+            if h.GetName() == "VVJ":
+                integral_names.append("EWK")
+            else:
+                integral_names.append(h.GetName())
+
+
         bkghist.Draw("e2same")
         blind_datagraph_extra = blind_datagraph.Clone()
         blind_datagraph_extra.Draw("P Z 0 same")
@@ -662,6 +684,29 @@ def main(args):
         begin_left = 0.180
     latex2.SetTextFont(42)
     latex2.DrawLatex(begin_left, 0.960, channel_label)
+    latex2.DrawLatex(begin_left + 0.075, 0.960, mode.upper())
+    top = 0.86
+
+
+    for key, integ in integral_raw.items():
+        if key == 'VVJ':
+            key ==  "EWK"
+
+        latex2.SetTextSize(0.025)  # Set smaller font size
+        latex2.DrawLatex(begin_left + 0.05, top, f"{key}: {integ:.2f}")
+        top -= 0.03
+
+    # for name, integ in zip(integral_names, integrals):
+    #     latex2.SetTextSize(0.025)  # Set smaller font size
+    #     latex2.DrawLatex(begin_left + 0.05, top, f"{name}: {integ:.2f}")
+    #     top -= 0.03
+
+
+
+    # print('\n\nGET QCD AND W YIELDS...')
+    # for i, histo in enumerate(bkg_histos):
+    #     print(f"Background {i + 1}: {histo.GetName()}, Integral: {histo.Integral()}")
+
 
 
     #CMS and lumi labels
@@ -669,8 +714,8 @@ def main(args):
     extra=cms_label
     #extra='Preliminary'
     #DrawCMSLogo(pads[0], 'CMS', extra, 0, 0.07, -0.0, 2.0, '', 0.85, relExtraDX=0.05)
-    cms_scale=1.0
-    DrawCMSLogo(pads[0], 'CMS', extra, 11, 0.045, 0.05, 1.0, '', cms_scale)
+    # cms_scale=1.0
+    # DrawCMSLogo(pads[0], 'CMS', extra, 11, 0.045, 0.05, 1.0, '', cms_scale)
 
     plot.DrawTitle(pads[0], lumi, 3, textSize=0.6)
     

@@ -53,7 +53,7 @@ if 'harvest' in args.step or args.step == "all":
     os.system(f'python3 scripts/harvestDatacards_newQCD_uncerts.py --dm-bins -o outputs/{output_dir} --wp {args.wp} --useCRs -e {args.eras} --tightVsEle')
   else:
     os.system(f'python3 scripts/harvestDatacards_newQCD_uncerts.py --dm-bins -o outputs/{output_dir} --wp {args.wp} --useCRs -e {args.eras}')
-
+# HERE
 if 'ws' in args.step or args.step == "all":
   # make workspaces
   os.system(f'combineTool.py -M T2W -i outputs/{output_dir}/cmb/ -o ws.root --X-allow-no-signal')
