@@ -1,5 +1,5 @@
-# TauSF
-a repository for fitting the tau ID SFs using ZTT events
+# Combine_MSSM_Htautau
+A repository for creating the datacards and employing the fitting procedure using CombineHarvester for the MSMM Htautau analysis in Run3
 
 ## Setup
 
