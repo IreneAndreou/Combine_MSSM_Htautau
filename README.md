@@ -25,13 +25,13 @@ scram b
 ### Clone tauSF repository:
 
 ```bash
-git clone --branch CMSSW_14_X-PnetDM git@github.com:Ksavva1021/TauSF.git TauSF
+git clone --branch main git@github.com:IreneAndreou/Combine_MSSM_Htautau.git Combine_MSSM_Htautau
 ```
 
 compile:
 
 ```bash
-cd TauSF/
+cd Combine_MSSM_Htautau/
 scram b clean
 scram b -j8
 ```
@@ -54,7 +54,7 @@ cp -r datacards/your_mm_path/year/datacard_name.root shapes/ztt.datacard.m_vis.m
 ### hadd mt datacards placing them in shapes directory (vsEle is set to VVLoose in this case)
 
 ```bash
-hadd -f shapes/ztt.datacard.pt_2_vs_m_vis.mt.Run3_2022.vsJetVTight.vsEleVVLoose.root /vols/cms/ks1021/TauSF/CMSSW_14_1_0_pre4/src/CombineHarvester/TauSF/datacards/Run3_2022/sf_calculation/mt/*.root
+hadd -f shapes/ztt.datacard.pt_2_vs_m_vis.mt.Run3_2022.vsJetMedium.vsEleVVLoose.root /vols/cms/ia2318/Combine_MSSM_Htautau/CMSSW_14_1_0_pre4/src/CombineHarvester/Combine_MSSM_Htautau/datacards/Run3_2022/sf_calculation/mt/*.root
 ```
 
 ## Converting datacards
