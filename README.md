@@ -22,7 +22,7 @@ git checkout v3.0.0
 scram b
 ```
 
-### Clone tauSF repository:
+### Clone Combine_MSSM_Htautau repository:
 
 ```bash
 git clone --branch main git@github.com:IreneAndreou/Combine_MSSM_Htautau.git Combine_MSSM_Htautau
