@@ -10,7 +10,6 @@ NUM_TOYS = 50
 script = os.path.join("scripts", "run_gof.sh")
 # chmod +x the script to ensure it can be run
 subprocess.run(["chmod", "+x", script], check=True)
-
 def run_gof(channel, category):
     cmd = [
         script,
